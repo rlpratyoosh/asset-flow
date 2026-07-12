@@ -21,6 +21,14 @@ interface DashboardData {
     expected_return_date: string;
     days_overdue: number;
   }>;
+  activity_logs: Array<{
+    log_id: string;
+    user_id: string;
+    action: string;
+    entity: string;
+    entity_id: string;
+    created_at: string;
+  }>;
 }
 
 export default function DashboardPage() {
@@ -65,6 +73,32 @@ export default function DashboardPage() {
               assigned_to: "Priya Sharma",
               expected_return_date: "2026-07-10T18:00:00Z",
               days_overdue: 2
+            }
+          ],
+          activity_logs: [
+            {
+              log_id: "log-1",
+              user_id: "user-1",
+              action: "Allocated to Priya shah - IT dept",
+              entity: "Laptop AF-0114",
+              entity_id: "asset-1",
+              created_at: "2026-07-11T10:00:00Z"
+            },
+            {
+              log_id: "log-2",
+              user_id: "user-2",
+              action: "Booking confirmed - 2:00 to 3:00 PM",
+              entity: "Room B2",
+              entity_id: "asset-2",
+              created_at: "2026-07-11T11:00:00Z"
+            },
+            {
+              log_id: "log-3",
+              user_id: "user-3",
+              action: "Maintenance resolved",
+              entity: "Projector AF-0062",
+              entity_id: "asset-3",
+              created_at: "2026-07-11T12:00:00Z"
             }
           ]
         });
@@ -132,16 +166,15 @@ export default function DashboardPage() {
       <section>
         <h2 className={styles.sectionTitle}>Recent Activity</h2>
         <div className={styles.activityList}>
-          {/* Note: Recent activity isn't in the API docs, using static mock based on wireframe */}
-          <div className={styles.activityItem}>
-            Laptop AF-0114 - allocated to Priya shah - IT dept
-          </div>
-          <div className={styles.activityItem}>
-            Room B2 - booking confirmed - 2:00 to 3:00 PM
-          </div>
-          <div className={styles.activityItem}>
-            Projector AF-0062 - maintenance resolved
-          </div>
+          {data?.activity_logs && data.activity_logs.length > 0 ? (
+            data.activity_logs.map((log) => (
+              <div key={log.log_id} className={styles.activityItem}>
+                {log.entity} - {log.action.toLowerCase()}
+              </div>
+            ))
+          ) : (
+            <div className={styles.activityItem}>No recent activity.</div>
+          )}
         </div>
       </section>
     </div>
