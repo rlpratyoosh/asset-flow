@@ -74,11 +74,17 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             >
               Audit
             </Link>
-            <Link href="#" className={styles.navItem}>
+            <Link 
+              href="/reports" 
+              className={`${styles.navItem} ${pathname.startsWith('/reports') ? styles.active : ''}`}
+            >
               Reports
             </Link>
-            <Link href="#" className={styles.navItem}>
-              Notifications
+            <Link 
+              href="/logs" 
+              className={`${styles.navItem} ${pathname.startsWith('/logs') ? styles.active : ''}`}
+            >
+              Logs & Notifications
             </Link>
           </nav>
         </aside>

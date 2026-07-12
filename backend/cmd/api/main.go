@@ -118,6 +118,17 @@ func main() {
 		v1.POST("/audits/:id/items", middleware.AuthMiddleware(), handlers.LogAuditItem)
 		v1.PUT("/audits/:id/close", middleware.AuthMiddleware(), handlers.CloseAuditCycle)
 
+		// Reports & Analytics
+		v1.GET("/reports/depreciation", middleware.AuthMiddleware(), handlers.GetDepreciationReport)
+		v1.GET("/reports/condition", middleware.AuthMiddleware(), handlers.GetConditionSummary)
+		v1.GET("/reports/allocation", middleware.AuthMiddleware(), handlers.GetAllocationSummary)
+		v1.GET("/reports/export", middleware.AuthMiddleware(), handlers.ExportReport)
+
+		// Activity Logs & Notifications
+		v1.GET("/logs", middleware.AuthMiddleware(), handlers.ListActivityLogs)
+		v1.GET("/notifications", middleware.AuthMiddleware(), handlers.ListNotifications)
+		v1.PUT("/notifications/:id/read", middleware.AuthMiddleware(), handlers.MarkNotificationRead)
+
 		// Organization Setup
 		v1.GET("/departments", middleware.AuthMiddleware(), handlers.ListDepartments)
 		v1.POST("/departments", middleware.AuthMiddleware(), handlers.CreateDepartment)

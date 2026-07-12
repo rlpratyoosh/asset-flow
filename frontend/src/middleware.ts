@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 
 // As requested, using array variables and logic but keeping elements empty for now,
 // except for the core auth logic the user explicitly requested ("only non-logins can join").
-const protectedRoutes: string[] = ['/dashboard', '/organization-setup', '/assets', '/allocation', '/booking', '/maintenance', '/audit'];
+const protectedRoutes: string[] = ['/dashboard', '/organization-setup', '/assets', '/allocation', '/booking', '/maintenance', '/audit', '/reports', '/logs'];
 const publicRoutes: string[] = ['/'];
 const authRoutes: string[] = ['/login', '/register'];
 
