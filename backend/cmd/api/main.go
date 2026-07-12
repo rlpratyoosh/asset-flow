@@ -86,6 +86,11 @@ func main() {
 
 		v1.GET("/me", middleware.AuthMiddleware(), handlers.Me)
 		v1.GET("/dashboard", middleware.AuthMiddleware(), handlers.Dashboard)
+
+		v1.POST("/assets", middleware.AuthMiddleware(), handlers.RegisterAsset)
+		v1.GET("/assets", middleware.AuthMiddleware(), handlers.ListAssets)
+		v1.POST("/assets/:id/allocate", middleware.AuthMiddleware(), handlers.AllocateAsset)
+		v1.POST("/assets/:id/return", middleware.AuthMiddleware(), handlers.ReturnAsset)
 	}
 
 	r.Static("/pfp", "./pfp")
