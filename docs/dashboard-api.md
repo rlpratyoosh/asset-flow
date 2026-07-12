@@ -42,6 +42,16 @@ Retrieves key performance indicators (KPIs) and overdue allocations. The respons
             "expected_return_date": "2026-07-10T18:00:00Z",
             "days_overdue": 2
           }
+        ],
+        "activity_logs": [
+          {
+            "log_id": "uuid-here",
+            "user_id": "uuid-here",
+            "action": "Checked out",
+            "entity": "Asset",
+            "entity_id": "uuid-here",
+            "created_at": "2026-07-11T10:00:00Z"
+          }
         ]
       }
     }

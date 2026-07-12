@@ -16,8 +16,9 @@ type DashboardResponse struct {
 }
 
 type DashboardData struct {
-	KPIs               KPIs                `json:"kpis"`
-	OverdueAllocations []OverdueAllocation `json:"overdue_allocations"`
+	KPIs               KPIs                  `json:"kpis"`
+	OverdueAllocations []OverdueAllocation   `json:"overdue_allocations"`
+	ActivityLogs       []ActivityLogResponse `json:"activity_logs"`
 }
 
 type KPIs struct {
@@ -39,6 +40,15 @@ type OverdueAllocation struct {
 	DaysOverdue        int    `json:"days_overdue"`
 }
 
+type ActivityLogResponse struct {
+	LogID     string `json:"log_id"`
+	UserID    string `json:"user_id"`
+	Action    string `json:"action"`
+	Entity    string `json:"entity"`
+	EntityID  string `json:"entity_id"`
+	CreatedAt string `json:"created_at"`
+}
+
 func Dashboard(c *gin.Context) {
 	userID := c.GetString("userID")
 	role := c.GetString("role")
@@ -46,6 +56,7 @@ func Dashboard(c *gin.Context) {
 
 	var kpis KPIs
 	var overdueAllocations []OverdueAllocation
+	var activityLogs []ActivityLogResponse
 	var wg sync.WaitGroup
 
 	db := database.DB
@@ -55,6 +66,7 @@ func Dashboard(c *gin.Context) {
 	bookingScope := db.Model(&models.Booking{})
 	transferScope := db.Model(&models.TransferRequest{})
 	maintenanceScope := db.Model(&models.MaintenanceRequest{})
+	activityLogScope := db.Model(&models.ActivityLog{})
 
 	if role == string(models.RoleEmployee) {
 		allocationScope = allocationScope.Where("assigned_to_user_id = ?", userID)
@@ -62,9 +74,11 @@ func Dashboard(c *gin.Context) {
 		transferScope = transferScope.Where("requested_by_id = ?", userID)
 		maintenanceScope = maintenanceScope.Where("raised_by_id = ?", userID)
 		assetScope = assetScope.Joins("JOIN allocations ON allocations.asset_id = assets.id").Where("allocations.assigned_to_user_id = ? AND allocations.returned_at IS NULL", userID)
+		activityLogScope = activityLogScope.Where("user_id = ?", userID)
 	} else if role == string(models.RoleDepartmentHead) && deptID != "" {
 		allocationScope = allocationScope.Where("assigned_to_dept_id = ?", deptID)
 		assetScope = assetScope.Joins("JOIN allocations ON allocations.asset_id = assets.id").Where("allocations.assigned_to_dept_id = ? AND allocations.returned_at IS NULL", deptID)
+		activityLogScope = activityLogScope.Joins("JOIN users ON users.id = activity_logs.user_id").Where("users.department_id = ?", deptID)
 	}
 
 	wg.Add(7)
@@ -144,10 +158,31 @@ func Dashboard(c *gin.Context) {
 		}
 	}()
 
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var logs []models.ActivityLog
+		activityLogScope.Order("created_at desc").Limit(20).Find(&logs)
+
+		for _, l := range logs {
+			activityLogs = append(activityLogs, ActivityLogResponse{
+				LogID:     l.ID,
+				UserID:    l.UserID,
+				Action:    l.Action,
+				Entity:    l.Entity,
+				EntityID:  l.EntityID,
+				CreatedAt: l.CreatedAt.Format(time.RFC3339),
+			})
+		}
+	}()
+
 	wg.Wait()
 
 	if overdueAllocations == nil {
 		overdueAllocations = []OverdueAllocation{}
+	}
+	if activityLogs == nil {
+		activityLogs = []ActivityLogResponse{}
 	}
 
 	c.JSON(http.StatusOK, DashboardResponse{
@@ -155,6 +190,7 @@ func Dashboard(c *gin.Context) {
 		Data: DashboardData{
 			KPIs:               kpis,
 			OverdueAllocations: overdueAllocations,
+			ActivityLogs:       activityLogs,
 		},
 	})
 }
