@@ -35,6 +35,7 @@ export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchDashboardData() {
@@ -107,6 +108,19 @@ export default function DashboardPage() {
       }
     }
 
+    async function fetchUserRole() {
+      try {
+        const res = await fetch('/api/v1/me');
+        if (res.ok) {
+          const userData = await res.json();
+          setRole(userData.role);
+        }
+      } catch (err) {
+        console.error("Failed to fetch role");
+      }
+    }
+
+    fetchUserRole();
     fetchDashboardData();
   }, []);
 
@@ -158,7 +172,9 @@ export default function DashboardPage() {
       )}
 
       <div className={styles.actionButtons}>
-        <button className={`${styles.btnAction} ${styles.primary}`}>+ register asset</button>
+        {(role === 'Admin' || role === 'AssetManager') && (
+          <button className={`${styles.btnAction} ${styles.primary}`}>+ register asset</button>
+        )}
         <button className={styles.btnAction}>Book resource</button>
         <button className={styles.btnAction}>Raise requests</button>
       </div>

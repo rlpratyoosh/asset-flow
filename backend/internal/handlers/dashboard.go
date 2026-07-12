@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rlpratyoosh/asset-flow/internal/database"
 	"github.com/rlpratyoosh/asset-flow/internal/models"
+	"gorm.io/gorm"
 )
 
 type DashboardResponse struct {
@@ -85,19 +86,19 @@ func Dashboard(c *gin.Context) {
 
 	go func() {
 		defer wg.Done()
-		assetScope.Where("assets.state = ?", "Available").Count(&kpis.AssetsAvailable)
+		assetScope.Session(&gorm.Session{}).Where("assets.state = ?", "Available").Count(&kpis.AssetsAvailable)
 	}()
 	go func() {
 		defer wg.Done()
-		assetScope.Where("assets.state = ?", "Allocated").Count(&kpis.AssetsAllocated)
+		assetScope.Session(&gorm.Session{}).Where("assets.state = ?", "Allocated").Count(&kpis.AssetsAllocated)
 	}()
 	go func() {
 		defer wg.Done()
-		bookingScope.Where("status = ?", "Ongoing").Count(&kpis.ActiveBookings)
+		bookingScope.Session(&gorm.Session{}).Where("status = ?", "Ongoing").Count(&kpis.ActiveBookings)
 	}()
 	go func() {
 		defer wg.Done()
-		transferScope.Where("status = ?", "Pending").Count(&kpis.PendingTransfers)
+		transferScope.Session(&gorm.Session{}).Where("status = ?", "Pending").Count(&kpis.PendingTransfers)
 	}()
 
 	now := time.Now()
@@ -106,17 +107,17 @@ func Dashboard(c *gin.Context) {
 
 	go func() {
 		defer wg.Done()
-		maintenanceScope.Where("created_at >= ? AND created_at <= ?", startOfDay, endOfDay).Count(&kpis.MaintenanceToday)
+		maintenanceScope.Session(&gorm.Session{}).Where("created_at >= ? AND created_at <= ?", startOfDay, endOfDay).Count(&kpis.MaintenanceToday)
 	}()
 
 	go func() {
 		defer wg.Done()
-		allocationScope.Where("expected_return_date > ? AND expected_return_date <= ? AND returned_at IS NULL", now, endOfDay).Count(&kpis.UpcomingReturns)
+		allocationScope.Session(&gorm.Session{}).Where("expected_return_date > ? AND expected_return_date <= ? AND returned_at IS NULL", now, endOfDay).Count(&kpis.UpcomingReturns)
 	}()
 
 	go func() {
 		defer wg.Done()
-		allocationScope.Where("expected_return_date < ? AND returned_at IS NULL", now).Count(&kpis.OverdueReturns)
+		allocationScope.Session(&gorm.Session{}).Where("expected_return_date < ? AND returned_at IS NULL", now).Count(&kpis.OverdueReturns)
 	}()
 
 	wg.Add(1)
@@ -162,7 +163,7 @@ func Dashboard(c *gin.Context) {
 	go func() {
 		defer wg.Done()
 		var logs []models.ActivityLog
-		activityLogScope.Order("created_at desc").Limit(20).Find(&logs)
+		activityLogScope.Session(&gorm.Session{}).Order("created_at desc").Limit(20).Find(&logs)
 
 		for _, l := range logs {
 			activityLogs = append(activityLogs, ActivityLogResponse{

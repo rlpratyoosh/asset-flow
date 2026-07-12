@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rlpratyoosh/asset-flow/internal/auth"
@@ -46,19 +45,17 @@ func AuthMiddleware() gin.HandlerFunc {
 				return
 			}
 
-			newAccess, newRefresh, err := auth.GenerateTokens(claims.UserID, claims.Username)
+			newAccess, _, err := auth.GenerateTokens(claims.UserID, claims.Username)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to rotate tokens"})
 				c.Abort()
 				return
 			}
 
-			session.RefreshToken = newRefresh
-			session.ExpiresAt = time.Now().Add(7 * 24 * time.Hour).Unix()
-			database.DB.Save(&session)
-
+			// We only issue a new access token and KEEP the existing refresh token.
+			// This prevents a race condition where concurrent API requests from the frontend
+			// try to use the same refresh token while one request is actively rotating it in the DB.
 			c.SetCookie("access_token", newAccess, 15*60, "/", "", false, true)
-			c.SetCookie("refresh_token", newRefresh, 7*24*60*60, "/", "", false, true)
 		}
 
 		c.Set("userID", claims.UserID)

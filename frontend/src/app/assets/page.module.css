@@ -1,5 +1,7 @@
 .container {
-  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -8,33 +10,37 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .header h1 {
-  font-size: 2rem;
-  color: #333;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--foreground);
 }
 
 .primaryButton {
-  background-color: #0070f3;
-  color: white;
-  border: none;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+  border-radius: 8px;
   padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .primaryButton:hover {
-  background-color: #0051a8;
+  background: rgba(16, 185, 129, 0.2);
 }
 
 .content {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   padding: 2rem;
 }
 
@@ -47,19 +53,33 @@
 .searchInput {
   flex-grow: 1;
   padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--foreground);
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .searchButton {
-  background-color: #f0f0f0;
-  color: #333;
-  border: 1px solid #ddd;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--foreground);
   padding: 0.75rem 1.5rem;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.searchButton:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .assetTable {
@@ -71,17 +91,21 @@
 .assetTable td {
   padding: 1rem;
   text-align: left;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.95rem;
 }
 
 .assetTable th {
-  background-color: #f9f9f9;
-  font-weight: 600;
-  color: #555;
+  font-weight: 500;
+  color: #a1a1aa;
+}
+
+.assetTable td {
+  color: #e4e4e7;
 }
 
 .emptyState {
   text-align: center;
   padding: 3rem !important;
-  color: #888;
+  color: #a1a1aa;
 }

@@ -3,7 +3,7 @@ import styles from './page.module.css';
 import { cookies } from 'next/headers';
 
 async function fetchUserRole() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get('access_token');
   
   if (!token) return null;
