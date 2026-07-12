@@ -2,6 +2,22 @@
 
 import { useState, useEffect } from 'react';
 import styles from './page.module.css';
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+import { format, parse, startOfWeek, getDay } from 'date-fns';
+import { enUS } from 'date-fns/locale';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+
+const locales = {
+  'en-US': enUS,
+}
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+})
 
 interface Booking {
   ID: string;
@@ -191,44 +207,61 @@ export default function BookingPage() {
         {loading ? (
           <div className={styles.emptyState}>Loading schedule...</div>
         ) : (
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th className={styles.th}>Resource</th>
-                <th className={styles.th}>Start Time</th>
-                <th className={styles.th}>End Time</th>
-                <th className={styles.th}>Status</th>
-                <th className={styles.th}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bookings.length === 0 && (
-                <tr>
-                  <td colSpan={5} className={styles.emptyState}>No bookings found.</td>
-                </tr>
-              )}
-              {bookings.map(b => (
-                <tr key={b.ID}>
-                  <td className={styles.td}>{getAssetName(b.AssetID)}</td>
-                  <td className={styles.td}>{new Date(b.StartTime).toLocaleString()}</td>
-                  <td className={styles.td}>{new Date(b.EndTime).toLocaleString()}</td>
-                  <td className={styles.td}>
-                    <span className={`${styles.statusBadge} ${getStatusClass(b.Status)}`}>
-                      {b.Status}
-                    </span>
-                  </td>
-                  <td className={styles.td}>
-                    {b.Status === 'Upcoming' && (b.BookedByID === userId || userRole === 'Admin' || userRole === 'AssetManager') && (
-                      <button className={styles.btnDanger} onClick={() => handleCancel(b.ID)}>
-                        Cancel
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div style={{ height: '500px', background: '#ffffff', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border)' }}>
+            <Calendar
+              localizer={localizer}
+              events={bookings.filter(b => b.Status !== 'Cancelled').map(b => ({
+                id: b.ID,
+                title: `${getAssetName(b.AssetID)} (${b.Status})`,
+                start: new Date(b.StartTime),
+                end: new Date(b.EndTime),
+                allDay: false
+              }))}
+              startAccessor="start"
+              endAccessor="end"
+              style={{ height: '100%', color: '#000000' }}
+            />
+          </div>
         )}
+      </div>
+
+      <div className={styles.content}>
+        <h2>My Upcoming Bookings</h2>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th className={styles.th}>Resource</th>
+              <th className={styles.th}>Start Time</th>
+              <th className={styles.th}>End Time</th>
+              <th className={styles.th}>Status</th>
+              <th className={styles.th}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bookings.filter(b => b.Status === 'Upcoming' && (b.BookedByID === userId || userRole === 'Admin' || userRole === 'AssetManager')).length === 0 && (
+              <tr>
+                <td colSpan={5} className={styles.emptyState}>No upcoming bookings to manage.</td>
+              </tr>
+            )}
+            {bookings.filter(b => b.Status === 'Upcoming' && (b.BookedByID === userId || userRole === 'Admin' || userRole === 'AssetManager')).map(b => (
+              <tr key={b.ID}>
+                <td className={styles.td}>{getAssetName(b.AssetID)}</td>
+                <td className={styles.td}>{new Date(b.StartTime).toLocaleString()}</td>
+                <td className={styles.td}>{new Date(b.EndTime).toLocaleString()}</td>
+                <td className={styles.td}>
+                  <span className={`${styles.statusBadge} ${getStatusClass(b.Status)}`}>
+                    {b.Status}
+                  </span>
+                </td>
+                <td className={styles.td}>
+                  <button className={styles.btnDanger} onClick={() => handleCancel(b.ID)}>
+                    Cancel
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

@@ -35,6 +35,38 @@
   background: rgba(16, 185, 129, 0.2);
 }
 
+.actionButton {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionButton:hover {
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.secondaryButton {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+}
+
+.secondaryButton:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
 .content {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
@@ -182,12 +214,16 @@
 .formGroup input[type="text"],
 .formGroup input[type="number"],
 .formGroup input[type="date"],
-.formGroup select {
+.formGroup input[type="datetime-local"],
+.formGroup select,
+.formGroup textarea {
   padding: 0.75rem;
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--foreground);
+  font-family: inherit;
+  resize: vertical;
 }
 
 .formActions {

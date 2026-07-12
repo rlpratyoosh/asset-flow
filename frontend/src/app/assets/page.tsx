@@ -27,6 +27,17 @@ interface Category {
   Name: string;
 }
 
+interface User {
+  ID: string;
+  FullName: string;
+  DepartmentID: string;
+}
+
+interface Department {
+  ID: string;
+  Name: string;
+}
+
 function AssetsPageContent() {
   const searchParams = useSearchParams();
   const [role, setRole] = useState<string | null>(null);
@@ -49,11 +60,23 @@ function AssetsPageContent() {
     is_shared: false
   });
 
+  const [users, setUsers] = useState<User[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [allocateModalAsset, setAllocateModalAsset] = useState<Asset | null>(null);
+  const [returnModalAsset, setReturnModalAsset] = useState<Asset | null>(null);
+  const [allocateForm, setAllocateForm] = useState({ assigned_to_user_id: '', assigned_to_dept_id: '', expected_return_date: '' });
+  const [returnNotes, setReturnNotes] = useState('');
+
   useEffect(() => {
     fetch('/api/v1/me')
       .then(res => res.ok ? res.json() : null)
       .then(data => {
-        if (data) setRole(data.role);
+        if (data) {
+          setRole(data.role);
+          if (['Admin', 'AssetManager', 'DepartmentHead'].includes(data.role)) {
+            fetchDepsAndUsers();
+          }
+        }
       })
       .catch(console.error);
 
@@ -64,6 +87,19 @@ function AssetsPageContent() {
       setShowModal(true);
     }
   }, [searchParams]);
+
+  const fetchDepsAndUsers = async () => {
+    try {
+      const [depRes, userRes] = await Promise.all([
+        fetch('/api/v1/departments'),
+        fetch('/api/v1/users')
+      ]);
+      if (depRes.ok) setDepartments(await depRes.json());
+      if (userRes.ok) setUsers(await userRes.json());
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const fetchCategories = async () => {
     try {
@@ -125,6 +161,77 @@ function AssetsPageContent() {
     }
   };
 
+  const handleAllocate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!allocateModalAsset) return;
+    try {
+      const csrfRes = await fetch("/api/v1/csrf-token");
+      if (!csrfRes.ok) throw new Error("Failed to get CSRF token");
+      const { csrf_token } = await csrfRes.json();
+
+      const payload: any = {};
+      if (allocateForm.assigned_to_user_id) payload.assigned_to_user_id = allocateForm.assigned_to_user_id;
+      if (allocateForm.assigned_to_dept_id) payload.assigned_to_dept_id = allocateForm.assigned_to_dept_id;
+      if (allocateForm.expected_return_date) payload.expected_return_date = new Date(allocateForm.expected_return_date).toISOString();
+
+      const res = await fetch(`/api/v1/assets/${allocateModalAsset.ID}/allocate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf_token },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        setAllocateModalAsset(null);
+        fetchAssets(search);
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Failed to allocate asset');
+      }
+    } catch (err) { console.error(err); }
+  };
+
+  const handleReturn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!returnModalAsset) return;
+    try {
+      const csrfRes = await fetch("/api/v1/csrf-token");
+      if (!csrfRes.ok) throw new Error("Failed to get CSRF token");
+      const { csrf_token } = await csrfRes.json();
+
+      const res = await fetch(`/api/v1/assets/${returnModalAsset.ID}/return`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf_token },
+        body: JSON.stringify({ return_notes: returnNotes })
+      });
+      if (res.ok) {
+        setReturnModalAsset(null);
+        fetchAssets(search);
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Failed to return asset');
+      }
+    } catch (err) { console.error(err); }
+  };
+
+  const handleRequestTransfer = async (assetID: string) => {
+    if (!confirm("Are you sure you want to request a transfer for this asset?")) return;
+    try {
+      const csrfRes = await fetch("/api/v1/csrf-token");
+      if (!csrfRes.ok) throw new Error("Failed to get CSRF token");
+      const { csrf_token } = await csrfRes.json();
+
+      const res = await fetch(`/api/v1/assets/${assetID}/transfer`, {
+        method: 'POST',
+        headers: { 'X-CSRF-Token': csrf_token }
+      });
+      if (res.ok) {
+        alert("Transfer request submitted successfully.");
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Failed to request transfer');
+      }
+    } catch (err) { console.error(err); }
+  };
+
   const canRegisterAsset = role === 'Admin' || role === 'AssetManager';
 
   return (
@@ -159,6 +266,7 @@ function AssetsPageContent() {
                 <th>Category</th>
                 <th>Status</th>
                 <th>Condition</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -182,6 +290,17 @@ function AssetsPageContent() {
                       </span>
                     </td>
                     <td>{asset.Condition}</td>
+                    <td style={{ display: 'flex', gap: '0.5rem' }}>
+                      {asset.State === 'Available' && canRegisterAsset && (
+                        <button className={styles.actionButton} onClick={() => { setAllocateForm({ assigned_to_user_id: '', assigned_to_dept_id: '', expected_return_date: '' }); setAllocateModalAsset(asset); }}>Allocate</button>
+                      )}
+                      {asset.State === 'Allocated' && canRegisterAsset && (
+                        <button className={styles.secondaryButton} onClick={() => { setReturnNotes(''); setReturnModalAsset(asset); }}>Return</button>
+                      )}
+                      {asset.State === 'Allocated' && (
+                        <button className={styles.secondaryButton} onClick={() => handleRequestTransfer(asset.ID)}>Request Transfer</button>
+                      )}
+                    </td>
                   </tr>
                 ))
               )}
@@ -241,6 +360,56 @@ function AssetsPageContent() {
               <div className={styles.formActions}>
                 <button type="button" onClick={() => setShowModal(false)} className={styles.cancelButton}>Cancel</button>
                 <button type="submit" className={styles.submitButton}>Register</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {allocateModalAsset && (
+        <div className={styles.modalOverlay} onClick={() => setAllocateModalAsset(null)}>
+          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <h2>Allocate Asset: {allocateModalAsset.Name}</h2>
+            <form onSubmit={handleAllocate} className={styles.form}>
+              <div className={styles.formGroup}>
+                <label>Assign To User (Optional)</label>
+                <select value={allocateForm.assigned_to_user_id} onChange={e => setAllocateForm({...allocateForm, assigned_to_user_id: e.target.value, assigned_to_dept_id: ''})}>
+                  <option value="">None</option>
+                  {users.map(u => <option key={u.ID} value={u.ID}>{u.FullName}</option>)}
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label>Assign To Department (Optional)</label>
+                <select value={allocateForm.assigned_to_dept_id} onChange={e => setAllocateForm({...allocateForm, assigned_to_dept_id: e.target.value, assigned_to_user_id: ''})}>
+                  <option value="">None</option>
+                  {departments.map(d => <option key={d.ID} value={d.ID}>{d.Name}</option>)}
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label>Expected Return Date (Optional)</label>
+                <input type="datetime-local" value={allocateForm.expected_return_date} onChange={e => setAllocateForm({...allocateForm, expected_return_date: e.target.value})} />
+              </div>
+              <div className={styles.formActions}>
+                <button type="button" onClick={() => setAllocateModalAsset(null)} className={styles.cancelButton}>Cancel</button>
+                <button type="submit" className={styles.submitButton} disabled={!allocateForm.assigned_to_user_id && !allocateForm.assigned_to_dept_id}>Allocate</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {returnModalAsset && (
+        <div className={styles.modalOverlay} onClick={() => setReturnModalAsset(null)}>
+          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <h2>Return Asset: {returnModalAsset.Name}</h2>
+            <form onSubmit={handleReturn} className={styles.form}>
+              <div className={styles.formGroup}>
+                <label>Return Notes</label>
+                <textarea value={returnNotes} onChange={e => setReturnNotes(e.target.value)} rows={3} required />
+              </div>
+              <div className={styles.formActions}>
+                <button type="button" onClick={() => setReturnModalAsset(null)} className={styles.cancelButton}>Cancel</button>
+                <button type="submit" className={styles.submitButton}>Confirm Return</button>
               </div>
             </form>
           </div>
