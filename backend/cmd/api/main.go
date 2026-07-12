@@ -50,6 +50,14 @@ func main() {
 	err = database.DB.AutoMigrate(
 		&models.User{},
 		&models.Session{},
+		&models.Allocation{},
+		&models.TransferRequest{},
+		&models.Booking{},
+		&models.MaintenanceRequest{},
+		&models.AuditCycle{},
+		&models.AuditItem{},
+		&models.Notification{},
+		&models.ActivityLog{},
 	)
 	if err != nil {
 		log.Fatalf("Auto-migration failed: %v", err)

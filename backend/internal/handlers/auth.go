@@ -157,5 +157,6 @@ func Me(c *gin.Context) {
 		"fullname": user.FullName,
 		"username": user.Username,
 		"pfp":      user.ProfilePic,
+		"role":     user.Role,
 	})
 }

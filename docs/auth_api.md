@@ -22,7 +22,7 @@ Generates a new CSRF token and sets it as a cookie.
 ---
 
 ## 2. Register User
-Registers a new user account.
+Registers a new user account. Role is automatically set to `Employee` upon registration and can only be modified by an Admin.
 
 * **URL:** `/register`
 * **Method:** `POST`
@@ -104,4 +104,3 @@ Retrieves the profile information of the currently authenticated user.
     ```
   * **401 Unauthorized:** `{"error": "Unauthorized"}`
   * **404 Not Found:** `{"error": "User not found"}`
-
