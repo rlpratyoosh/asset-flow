@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -12,7 +11,6 @@ import (
 	"github.com/rlpratyoosh/asset-flow/internal/database"
 	"github.com/rlpratyoosh/asset-flow/internal/handlers"
 	"github.com/rlpratyoosh/asset-flow/internal/middleware"
-	"github.com/rlpratyoosh/asset-flow/internal/models"
 )
 
 var PORT string
@@ -46,28 +44,6 @@ func main() {
 	}
 
 	database.Connect()
-
-	err = database.DB.AutoMigrate(
-		&models.User{},
-		&models.Session{},
-		&models.Department{},
-		&models.Category{},
-		&models.Asset{},
-		&models.Allocation{},
-		&models.TransferRequest{},
-		&models.Booking{},
-		&models.MaintenanceRequest{},
-		&models.AuditCycle{},
-		&models.AuditItem{},
-		&models.Notification{},
-		&models.ActivityLog{},
-	)
-	if err != nil {
-		log.Fatalf("Auto-migration failed: %v", err)
-	}
-
-	// Workaround for GORM not updating existing columns with new default values
-	database.DB.Exec("ALTER TABLE sessions ALTER COLUMN id SET DEFAULT gen_random_uuid();")
 
 	r.Use(middleware.CORSMiddleware(ENV, FRONTEND_URL))
 

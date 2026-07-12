@@ -100,11 +100,11 @@ func GetAllocationSummary(c *gin.Context) {
 	results := []Result{}
 	query := `
 		SELECT d.name as department_name, COUNT(a.id) as asset_count
-		FROM asset_allocations aa
-		JOIN users u ON u.id = aa.allocated_to_id
+		FROM allocations aa
+		JOIN users u ON u.id = aa.assigned_to_user_id
 		JOIN departments d ON d.id = u.department_id
 		JOIN assets a ON a.id = aa.asset_id
-		WHERE aa.status = 'Active'
+		WHERE aa.returned_at IS NULL
 		GROUP BY d.name
 	`
 	if err := database.DB.Raw(query).Scan(&results).Error; err != nil {
