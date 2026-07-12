@@ -19,7 +19,8 @@ type User struct {
 	Username     string `gorm:"uniqueIndex;not null"`
 	PasswordHash string `gorm:"not null"`
 	ProfilePic   string
-	Role         Role `gorm:"type:varchar(50);default:'Employee';not null"`
+	DepartmentID *string `gorm:"index"`
+	Role         Role    `gorm:"type:varchar(50);default:'Employee';not null"`
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }

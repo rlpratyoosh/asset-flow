@@ -50,6 +50,7 @@ func main() {
 	err = database.DB.AutoMigrate(
 		&models.User{},
 		&models.Session{},
+		&models.Asset{},
 		&models.Allocation{},
 		&models.TransferRequest{},
 		&models.Booking{},
@@ -84,6 +85,7 @@ func main() {
 		v1.POST("/logout", handlers.Logout)
 
 		v1.GET("/me", middleware.AuthMiddleware(), handlers.Me)
+		v1.GET("/dashboard", middleware.AuthMiddleware(), handlers.Dashboard)
 	}
 
 	r.Static("/pfp", "./pfp")

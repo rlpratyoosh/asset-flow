@@ -62,6 +62,20 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		c.Set("userID", claims.UserID)
+
+		var user models.User
+		if err := database.DB.Where("id = ?", claims.UserID).First(&user).Error; err == nil {
+			c.Set("role", string(user.Role))
+			if user.DepartmentID != nil {
+				c.Set("deptID", *user.DepartmentID)
+			} else {
+				c.Set("deptID", "")
+			}
+		} else {
+			c.Set("role", string(models.RoleEmployee))
+			c.Set("deptID", "")
+		}
+
 		c.Next()
 	}
 }
