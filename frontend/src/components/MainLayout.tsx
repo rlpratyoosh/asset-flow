@@ -9,6 +9,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const [user, setUser] = useState<{username: string, profile_pic: string, role: string} | null>(null);
   const [showLogout, setShowLogout] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     fetch('/api/v1/me')
@@ -41,9 +42,15 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     <div className={styles.layout}>
       <header className={styles.header}>
         <div className={styles.logo}>AssetFlow</div>
+        <button 
+          className={styles.menuBtn} 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? '✕' : '☰'}
+        </button>
       </header>
       <div className={styles.container}>
-        <aside className={styles.sidebar}>
+        <aside className={`${styles.sidebar} ${isMobileMenuOpen ? styles.open : ''}`}>
           <nav className={styles.nav}>
             <Link 
               href="/dashboard" 

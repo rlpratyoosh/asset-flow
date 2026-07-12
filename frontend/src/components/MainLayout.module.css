@@ -10,10 +10,10 @@
   height: 64px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0 2rem;
   border-bottom: 1px solid var(--border);
-  background-color: rgba(10, 10, 15, 0.8);
-  backdrop-filter: blur(12px);
+  background-color: var(--background);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -22,9 +22,17 @@
 .logo {
   font-size: 1.5rem;
   font-weight: 800;
-  background: linear-gradient(to right, #a855f7, #6366f1);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--foreground);
+}
+
+.menuBtn {
+  display: none;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: var(--foreground);
 }
 
 .container {
@@ -36,7 +44,7 @@
   width: 260px;
   border-right: 1px solid var(--border);
   padding: 1.5rem 1rem;
-  background-color: rgba(10, 10, 15, 0.5);
+  background-color: #fafafa;
   display: flex;
   flex-direction: column;
 }
@@ -49,8 +57,8 @@
 
 .navItem {
   padding: 0.75rem 1rem;
-  border-radius: 8px;
-  color: #a1a1aa;
+  border-radius: 4px;
+  color: #666666;
   font-size: 0.95rem;
   font-weight: 500;
   transition: all 0.2s ease;
@@ -58,14 +66,13 @@
 }
 
 .navItem:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: #f4f4f5;
   color: var(--foreground);
 }
 
 .navItem.active {
-  background-color: rgba(99, 102, 241, 0.1);
-  color: var(--primary);
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  background-color: var(--primary);
+  color: #ffffff;
 }
 
 .mainContent {
@@ -82,20 +89,20 @@
   align-items: center;
   gap: 0.75rem;
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: 4px;
   position: relative;
   transition: background-color 0.2s;
 }
 
 .profileSection:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: #e5e5e5;
 }
 
 .profileIcon {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), #a855f7);
+  background: var(--foreground);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -127,7 +134,7 @@
 
 .profileRole {
   font-size: 0.8rem;
-  color: #a1a1aa;
+  color: #666666;
 }
 
 .logoutBtn {
@@ -136,10 +143,10 @@
   left: 0;
   width: 100%;
   padding: 0.5rem;
-  background-color: var(--card-bg);
+  background-color: #ffffff;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  color: #ef4444;
+  border-radius: 4px;
+  color: var(--error);
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -147,6 +154,27 @@
 }
 
 .logoutBtn:hover {
-  background-color: #ef4444;
+  background-color: var(--error);
   color: white;
+}
+
+@media (max-width: 768px) {
+  .menuBtn {
+    display: block;
+  }
+  
+  .container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    display: none;
+  }
+
+  .sidebar.open {
+    display: flex;
+  }
 }

@@ -29,7 +29,7 @@
 .tab {
   background: transparent;
   border: none;
-  color: #a1a1aa;
+  color: #666666;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
@@ -39,7 +39,7 @@
 }
 
 .tab:hover {
-  color: #e4e4e7;
+  color: var(--foreground);
   background: rgba(255, 255, 255, 0.05);
 }
 
@@ -66,20 +66,20 @@
   padding: 1rem;
   text-align: left;
   font-weight: 500;
-  color: #a1a1aa;
+  color: #666666;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .td {
   padding: 1rem;
-  color: #e4e4e7;
+  color: var(--foreground);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .emptyState {
   text-align: center;
   padding: 3rem;
-  color: #a1a1aa;
+  color: #666666;
 }
 
 .actionBtn {

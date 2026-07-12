@@ -97,17 +97,17 @@
 
 .assetTable th {
   font-weight: 500;
-  color: #a1a1aa;
+  color: #666666;
 }
 
 .assetTable td {
-  color: #e4e4e7;
+  color: var(--foreground);
 }
 
 .emptyState {
   text-align: center;
   padding: 3rem !important;
-  color: #a1a1aa;
+  color: #666666;
 }
 
 .badge {
@@ -176,7 +176,7 @@
 
 .formGroup label {
   font-size: 0.9rem;
-  color: #a1a1aa;
+  color: #666666;
 }
 
 .formGroup input[type="text"],

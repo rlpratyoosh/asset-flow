@@ -22,29 +22,39 @@
   gap: 1.5rem;
 }
 
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .card {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 4px;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border-color: #000000;
 }
 
 .cardTitle {
   font-size: 0.9rem;
   font-weight: 500;
-  color: #a1a1aa;
+  color: #666666;
 }
 
 .cardValue {
@@ -54,12 +64,12 @@
 }
 
 .alertBanner {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 4px;
   padding: 1rem 1.5rem;
-  color: #fca5a5;
-  font-weight: 500;
+  color: #000000;
+  font-weight: 600;
   font-size: 0.95rem;
   margin-top: 1rem;
   margin-bottom: 1.5rem;
@@ -71,12 +81,13 @@
   display: flex;
   gap: 1rem;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
 }
 
 .btnAction {
-  background: transparent;
+  background: #ffffff;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 0.75rem 1.5rem;
   color: var(--foreground);
   font-size: 0.95rem;
@@ -86,18 +97,18 @@
 }
 
 .btnAction:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: #f4f4f5;
+  border-color: #000000;
 }
 
 .btnAction.primary {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.3);
-  color: #34d399;
+  background: #000000;
+  border-color: #000000;
+  color: #ffffff;
 }
 
 .btnAction.primary:hover {
-  background: rgba(16, 185, 129, 0.2);
+  background: #333333;
 }
 
 .sectionTitle {
@@ -115,9 +126,9 @@
 
 .activityItem {
   font-size: 0.95rem;
-  color: #e4e4e7;
+  color: var(--foreground);
   padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border);
 }
 
 .activityItem:last-child {
@@ -129,15 +140,16 @@
   justify-content: center;
   align-items: center;
   min-height: 50vh;
-  color: #a1a1aa;
+  color: #666666;
   font-size: 1.2rem;
 }
 
 .error {
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
+  color: #000000;
+  background: #ffffff;
+  border: 1px solid #000000;
   padding: 1.5rem;
-  border-radius: 8px;
+  border-radius: 4px;
   text-align: center;
   margin-top: 2rem;
 }

@@ -38,6 +38,7 @@ export default function AuditPage() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [selectedAuditors, setSelectedAuditors] = useState<string[]>([]);
+  const [isAuditorDropdownOpen, setIsAuditorDropdownOpen] = useState(false);
   
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -232,19 +233,31 @@ export default function AuditPage() {
             </div>
             <div className={styles.inputGroup}>
               <label className={styles.label}>Assign Auditors</label>
-              <select 
-                multiple
-                className={`${styles.input} ${styles.selectMultiple}`}
-                value={selectedAuditors}
-                onChange={(e) => {
-                  const values = Array.from(e.target.selectedOptions, option => option.value);
-                  setSelectedAuditors(values);
-                }}
+              <div 
+                className={styles.input} 
+                onClick={() => setIsAuditorDropdownOpen(!isAuditorDropdownOpen)}
+                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', minHeight: '42px' }}
               >
-                {users.map(u => (
-                  <option key={u.ID} value={u.ID}>{u.FullName}</option>
-                ))}
-              </select>
+                {selectedAuditors.length > 0 
+                  ? `${selectedAuditors.length} selected`
+                  : 'Select Auditors...'}
+              </div>
+              {isAuditorDropdownOpen && (
+                <div className={styles.dropdownMenu}>
+                  {users.map(u => (
+                    <label key={u.ID} className={styles.dropdownItem}>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedAuditors.includes(u.ID)}
+                        onChange={(e) => {
+                          if (e.target.checked) setSelectedAuditors([...selectedAuditors, u.ID]);
+                          else setSelectedAuditors(selectedAuditors.filter(id => id !== u.ID));
+                        }}
+                      /> {u.FullName}
+                    </label>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
           <div style={{ marginTop: '1rem' }}>

@@ -15,54 +15,56 @@
 .tabs {
   display: flex;
   gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
 }
 
 .tab {
-  background: transparent;
+  background: #ffffff;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 0.5rem 1.5rem;
   color: var(--foreground);
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .tab:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: #f4f4f5;
+  border-color: #000000;
 }
 
 .tab.active {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.3);
-  color: #34d399;
+  background: #000000;
+  border-color: #000000;
+  color: #ffffff;
 }
 
 .addBtn {
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  border-radius: 8px;
+  background: #000000;
+  border: 1px solid #000000;
+  border-radius: 4px;
   padding: 0.5rem 1.5rem;
-  color: #34d399;
+  color: #ffffff;
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .addBtn:hover {
-  background: rgba(16, 185, 129, 0.2);
+  background: #333333;
 }
 
 .tableContainer {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  overflow: hidden;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow-x: auto;
 }
 
 .table {
@@ -75,7 +77,7 @@
   padding: 1rem 1.5rem;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #a1a1aa;
+  color: #666666;
   border-bottom: 1px solid var(--border);
 }
 
@@ -83,7 +85,7 @@
   padding: 1rem 1.5rem;
   font-size: 0.95rem;
   color: var(--foreground);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border);
 }
 
 .tr:last-child .td {
@@ -101,15 +103,15 @@
 }
 
 .statusActive {
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  color: #34d399;
+  background: #ffffff;
+  border: 1px solid #000000;
+  color: #000000;
 }
 
 .statusInactive {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #fca5a5;
+  background: #f4f4f5;
+  border: 1px solid var(--border);
+  color: #666666;
 }
 
 .footerNote {
@@ -121,19 +123,19 @@
 }
 
 .editBtn, .deleteBtn {
-  background: transparent;
+  background: #ffffff;
   border: 1px solid var(--border);
   color: var(--foreground);
   padding: 0.4rem 0.8rem;
-  border-radius: 6px;
+  border-radius: 4px;
   cursor: pointer;
   margin-right: 0.5rem;
   font-size: 0.85rem;
 }
 
 .deleteBtn {
-  color: #f87171;
-  border-color: rgba(239, 68, 68, 0.3);
+  color: #000000;
+  border-color: #000000;
 }
 
 .modalOverlay {
@@ -151,10 +153,10 @@
 }
 
 .modalContent {
-  background: var(--card-bg);
+  background: #ffffff;
   border: 1px solid var(--border);
   padding: 2rem;
-  border-radius: 12px;
+  border-radius: 4px;
   width: 90%;
   max-width: 450px;
 }
@@ -173,14 +175,14 @@
 
 .formGroup label {
   font-size: 0.9rem;
-  color: #a1a1aa;
+  color: #666666;
 }
 
 .formGroup input, .formGroup select {
   padding: 0.75rem;
-  background: rgba(0, 0, 0, 0.2);
+  background: #ffffff;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 4px;
   color: var(--foreground);
 }
 
@@ -193,18 +195,18 @@
 
 .cancelBtn {
   padding: 0.75rem 1.5rem;
-  background: transparent;
+  background: #ffffff;
   border: 1px solid var(--border);
   color: var(--foreground);
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: pointer;
 }
 
 .saveBtn {
   padding: 0.75rem 1.5rem;
   background: var(--primary);
-  border: none;
+  border: 1px solid var(--primary);
   color: white;
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: pointer;
 }
