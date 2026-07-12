@@ -53,10 +53,19 @@ export default function AllocationPage() {
     }
   }, [activeTab]);
 
-  const approveTransfer = async (requestID: string) => {
+  const handleApprove = async (requestID: string, approve: boolean) => {
     try {
+      const csrfRes = await fetch("/api/v1/csrf-token");
+      if (!csrfRes.ok) throw new Error("Failed to fetch CSRF token");
+      const { csrf_token } = await csrfRes.json();
+
       const res = await fetch(`/api/v1/assets/transfers/${requestID}/approve`, {
-        method: 'POST'
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrf_token
+        },
+        body: JSON.stringify({ approved: approve, comments: approve ? 'Approved by admin' : 'Rejected by admin' })
       });
       if (res.ok) {
         setTransfers(prev => prev.filter(t => t.ID !== requestID));
@@ -118,7 +127,7 @@ export default function AllocationPage() {
                   {(role === 'Admin' || role === 'AssetManager' || role === 'DepartmentHead') && (
                     <td className={styles.td}>
                       {req.Status === 'Pending' && (
-                        <button className={styles.actionBtn} onClick={() => approveTransfer(req.ID)}>
+                        <button className={styles.actionBtn} onClick={() => handleApprove(req.ID, true)}>
                           Approve
                         </button>
                       )}

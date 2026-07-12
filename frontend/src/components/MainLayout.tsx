@@ -7,16 +7,35 @@ import styles from './MainLayout.module.css';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [role, setRole] = useState<string | null>(null);
+  const [user, setUser] = useState<{username: string, profile_pic: string, role: string} | null>(null);
+  const [showLogout, setShowLogout] = useState(false);
 
   useEffect(() => {
     fetch('/api/v1/me')
       .then(res => res.ok ? res.json() : null)
       .then(data => {
-        if (data) setRole(data.role);
+        if (data) setUser(data);
       })
       .catch(console.error);
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      const csrfRes = await fetch("/api/v1/csrf-token");
+      if (!csrfRes.ok) throw new Error("Failed to fetch CSRF token");
+      const { csrf_token } = await csrfRes.json();
+
+      await fetch('/api/v1/logout', { 
+        method: 'POST',
+        headers: {
+          'X-CSRF-Token': csrf_token
+        }
+      });
+      window.location.href = '/login';
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className={styles.layout}>
@@ -32,7 +51,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             >
               Dashboard
             </Link>
-            {role === 'Admin' && (
+            {user?.role === 'Admin' && (
               <Link 
                 href="/organization-setup" 
                 className={`${styles.navItem} ${pathname.startsWith('/organization-setup') ? styles.active : ''}`}
@@ -40,7 +59,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 Organization setup
               </Link>
             )}
-            {role !== 'Employee' && (
+            {user?.role !== 'Employee' && (
               <Link 
                 href="/assets" 
                 className={`${styles.navItem} ${pathname.startsWith('/assets') ? styles.active : ''}`}
@@ -48,7 +67,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 Assets
               </Link>
             )}
-            {role !== 'Employee' && (
+            {user?.role !== 'Employee' && (
               <Link 
                 href="/allocation" 
                 className={`${styles.navItem} ${pathname.startsWith('/allocation') ? styles.active : ''}`}
@@ -87,6 +106,30 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               Logs & Notifications
             </Link>
           </nav>
+          
+          {user && (
+            <div className={styles.profileSection} onClick={() => setShowLogout(!showLogout)}>
+              <div className={styles.profileIcon}>
+                {user.profile_pic ? (
+                  <img src={user.profile_pic} alt="Profile" className={styles.profileImg} />
+                ) : (
+                  <span className={styles.profileInitials}>{user.username.charAt(0).toUpperCase()}</span>
+                )}
+              </div>
+              <div className={styles.profileInfo}>
+                <span className={styles.profileName}>{user.username}</span>
+                <span className={styles.profileRole}>{user.role}</span>
+              </div>
+              {showLogout && (
+                <button className={styles.logoutBtn} onClick={(e) => {
+                  e.stopPropagation();
+                  handleLogout();
+                }}>
+                  Logout
+                </button>
+              )}
+            </div>
+          )}
         </aside>
         <main className={styles.mainContent}>
           {children}

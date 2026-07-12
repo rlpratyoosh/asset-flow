@@ -70,9 +70,16 @@ export default function BookingPage() {
     }
 
     try {
+      const csrfRes = await fetch("/api/v1/csrf-token");
+      if (!csrfRes.ok) throw new Error("Failed to fetch CSRF token");
+      const { csrf_token } = await csrfRes.json();
+
       const res = await fetch('/api/v1/bookings', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrf_token 
+        },
         body: JSON.stringify({
           asset_id: selectedAsset,
           start_time: new Date(startTime).toISOString(),
@@ -97,8 +104,13 @@ export default function BookingPage() {
 
   const handleCancel = async (bookingId: string) => {
     try {
+      const csrfRes = await fetch("/api/v1/csrf-token");
+      if (!csrfRes.ok) throw new Error("Failed to fetch CSRF token");
+      const { csrf_token } = await csrfRes.json();
+
       const res = await fetch(`/api/v1/bookings/${bookingId}/cancel`, {
-        method: 'PUT'
+        method: 'PUT',
+        headers: { 'X-CSRF-Token': csrf_token }
       });
       if (res.ok) {
         // Refresh bookings

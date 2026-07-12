@@ -37,6 +37,8 @@
   border-right: 1px solid var(--border);
   padding: 1.5rem 1rem;
   background-color: rgba(10, 10, 15, 0.5);
+  display: flex;
+  flex-direction: column;
 }
 
 .nav {
@@ -70,4 +72,81 @@
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
+}
+
+.profileSection {
+  margin-top: auto;
+  padding: 1rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  border-radius: 8px;
+  position: relative;
+  transition: background-color 0.2s;
+}
+
+.profileSection:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.profileIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), #a855f7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.profileImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profileInitials {
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.profileName {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--foreground);
+}
+
+.profileRole {
+  font-size: 0.8rem;
+  color: #a1a1aa;
+}
+
+.logoutBtn {
+  position: absolute;
+  top: -45px;
+  left: 0;
+  width: 100%;
+  padding: 0.5rem;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: #ef4444;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s;
+}
+
+.logoutBtn:hover {
+  background-color: #ef4444;
+  color: white;
 }

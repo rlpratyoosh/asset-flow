@@ -74,9 +74,16 @@ export default function MaintenancePage() {
     }
 
     try {
+      const csrfRes = await fetch("/api/v1/csrf-token");
+      if (!csrfRes.ok) throw new Error("Failed to fetch CSRF token");
+      const { csrf_token } = await csrfRes.json();
+
       const res = await fetch('/api/v1/maintenance', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrf_token
+        },
         body: JSON.stringify({
           asset_id: selectedAsset,
           issue_desc: issueDesc,
@@ -107,9 +114,16 @@ export default function MaintenancePage() {
         if (name !== null) technician = name;
       }
 
+      const csrfRes = await fetch("/api/v1/csrf-token");
+      if (!csrfRes.ok) throw new Error("Failed to fetch CSRF token");
+      const { csrf_token } = await csrfRes.json();
+
       const res = await fetch(`/api/v1/maintenance/${id}/status`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrf_token
+        },
         body: JSON.stringify({
           status: newStatus,
           technician_name: technician

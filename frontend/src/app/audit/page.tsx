@@ -85,9 +85,16 @@ export default function AuditPage() {
     }
 
     try {
+      const csrfRes = await fetch("/api/v1/csrf-token");
+      if (!csrfRes.ok) throw new Error("Failed to fetch CSRF token");
+      const { csrf_token } = await csrfRes.json();
+
       const res = await fetch('/api/v1/audits', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrf_token
+        },
         body: JSON.stringify({
           start_date: new Date(startDate).toISOString(),
           end_date: new Date(endDate).toISOString(),
@@ -126,9 +133,16 @@ export default function AuditPage() {
     if (!activeModalAudit || !logAssetId) return;
 
     try {
+      const csrfRes = await fetch("/api/v1/csrf-token");
+      if (!csrfRes.ok) throw new Error("Failed to fetch CSRF token");
+      const { csrf_token } = await csrfRes.json();
+
       const res = await fetch(`/api/v1/audits/${activeModalAudit.ID}/items`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrf_token
+        },
         body: JSON.stringify({
           asset_id: logAssetId,
           status: logStatus
@@ -154,7 +168,14 @@ export default function AuditPage() {
     if (!confirm("Closing this audit will lock it and update missing/damaged asset statuses. Proceed?")) return;
     
     try {
-      const res = await fetch(`/api/v1/audits/${id}/close`, { method: 'PUT' });
+      const csrfRes = await fetch("/api/v1/csrf-token");
+      if (!csrfRes.ok) throw new Error("Failed to fetch CSRF token");
+      const { csrf_token } = await csrfRes.json();
+
+      const res = await fetch(`/api/v1/audits/${id}/close`, { 
+        method: 'PUT',
+        headers: { 'X-CSRF-Token': csrf_token }
+      });
       if (res.ok) {
         const aRes = await fetch('/api/v1/audits');
         setAudits(await aRes.json());

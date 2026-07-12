@@ -252,3 +252,42 @@ func UpdateUserRole(c *gin.Context) {
 	user.PasswordHash = ""
 	c.JSON(http.StatusOK, user)
 }
+
+func DeleteDepartment(c *gin.Context) {
+	if c.GetString("role") != string(models.RoleAdmin) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Only admins can delete departments"})
+		return
+	}
+	id := c.Param("id")
+	if err := database.DB.Where("id = ?", id).Delete(&models.Department{}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete department"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Department deleted"})
+}
+
+func DeleteCategory(c *gin.Context) {
+	if c.GetString("role") != string(models.RoleAdmin) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Only admins can delete categories"})
+		return
+	}
+	id := c.Param("id")
+	if err := database.DB.Where("id = ?", id).Delete(&models.Category{}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete category"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Category deleted"})
+}
+
+func DeleteUser(c *gin.Context) {
+	if c.GetString("role") != string(models.RoleAdmin) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Only admins can delete users"})
+		return
+	}
+	id := c.Param("id")
+	if err := database.DB.Where("id = ?", id).Delete(&models.User{}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "User deleted"})
+}

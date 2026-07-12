@@ -109,13 +109,16 @@ func main() {
 		v1.GET("/departments", middleware.AuthMiddleware(), handlers.ListDepartments)
 		v1.POST("/departments", middleware.AuthMiddleware(), handlers.CreateDepartment)
 		v1.PUT("/departments/:id", middleware.AuthMiddleware(), handlers.UpdateDepartment)
+		v1.DELETE("/departments/:id", middleware.AuthMiddleware(), handlers.DeleteDepartment)
 
 		v1.GET("/categories", middleware.AuthMiddleware(), handlers.ListCategories)
 		v1.POST("/categories", middleware.AuthMiddleware(), handlers.CreateCategory)
 		v1.PUT("/categories/:id", middleware.AuthMiddleware(), handlers.UpdateCategory)
+		v1.DELETE("/categories/:id", middleware.AuthMiddleware(), handlers.DeleteCategory)
 
 		v1.GET("/users", middleware.AuthMiddleware(), handlers.ListUsers)
 		v1.PUT("/users/:id/role", middleware.AuthMiddleware(), handlers.UpdateUserRole)
+		v1.DELETE("/users/:id", middleware.AuthMiddleware(), handlers.DeleteUser)
 	}
 
 	r.Static("/pfp", "./pfp")

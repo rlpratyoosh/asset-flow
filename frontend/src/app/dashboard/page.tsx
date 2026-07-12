@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 
 interface DashboardData {
@@ -32,6 +33,7 @@ interface DashboardData {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -173,10 +175,15 @@ export default function DashboardPage() {
 
       <div className={styles.actionButtons}>
         {(role === 'Admin' || role === 'AssetManager') && (
-          <button className={`${styles.btnAction} ${styles.primary}`}>+ register asset</button>
+          <button 
+            className={`${styles.btnAction} ${styles.primary}`}
+            onClick={() => router.push('/assets?register=true')}
+          >
+            + register asset
+          </button>
         )}
-        <button className={styles.btnAction}>Book resource</button>
-        <button className={styles.btnAction}>Raise requests</button>
+        <button className={styles.btnAction} onClick={() => router.push('/booking')}>Book resource</button>
+        <button className={styles.btnAction} onClick={() => router.push('/maintenance')}>Raise requests</button>
       </div>
 
       <section>

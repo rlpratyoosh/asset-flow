@@ -67,7 +67,14 @@ export default function LogsPage() {
 
   const markRead = async (id: string) => {
     try {
-      await fetch(`/api/v1/notifications/${id}/read`, { method: 'PUT' });
+      const csrfRes = await fetch("/api/v1/csrf-token");
+      if (!csrfRes.ok) throw new Error("Failed to fetch CSRF token");
+      const { csrf_token } = await csrfRes.json();
+
+      await fetch(`/api/v1/notifications/${id}/read`, { 
+        method: 'PUT',
+        headers: { 'X-CSRF-Token': csrf_token }
+      });
       setNotifications(prev => prev.map(n => n.ID === id ? { ...n, IsRead: true } : n));
     } catch(err) {
       console.error(err);
