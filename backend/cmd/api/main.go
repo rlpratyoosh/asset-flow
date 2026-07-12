@@ -111,6 +111,13 @@ func main() {
 		v1.POST("/maintenance", middleware.AuthMiddleware(), handlers.RaiseMaintenanceRequest)
 		v1.PUT("/maintenance/:id/status", middleware.AuthMiddleware(), handlers.UpdateMaintenanceStatus)
 
+		// Audit Management
+		v1.GET("/audits", middleware.AuthMiddleware(), handlers.ListAuditCycles)
+		v1.POST("/audits", middleware.AuthMiddleware(), handlers.CreateAuditCycle)
+		v1.GET("/audits/:id/items", middleware.AuthMiddleware(), handlers.GetAuditItems)
+		v1.POST("/audits/:id/items", middleware.AuthMiddleware(), handlers.LogAuditItem)
+		v1.PUT("/audits/:id/close", middleware.AuthMiddleware(), handlers.CloseAuditCycle)
+
 		// Organization Setup
 		v1.GET("/departments", middleware.AuthMiddleware(), handlers.ListDepartments)
 		v1.POST("/departments", middleware.AuthMiddleware(), handlers.CreateDepartment)

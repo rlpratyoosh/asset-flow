@@ -68,7 +68,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             >
               Maintenance Requests
             </Link>
-            <Link href="#" className={styles.navItem}>
+            <Link 
+              href="/audit" 
+              className={`${styles.navItem} ${pathname.startsWith('/audit') ? styles.active : ''}`}
+            >
               Audit
             </Link>
             <Link href="#" className={styles.navItem}>
