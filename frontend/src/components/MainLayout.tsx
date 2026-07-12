@@ -48,9 +48,14 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 Assets
               </Link>
             )}
-            <Link href="#" className={styles.navItem}>
-              Allocation & Transfer
-            </Link>
+            {role !== 'Employee' && (
+              <Link 
+                href="/allocation" 
+                className={`${styles.navItem} ${pathname.startsWith('/allocation') ? styles.active : ''}`}
+              >
+                Allocation & Transfer
+              </Link>
+            )}
             <Link href="#" className={styles.navItem}>
               Resource Booking
             </Link>

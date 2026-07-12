@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 
 // As requested, using array variables and logic but keeping elements empty for now,
 // except for the core auth logic the user explicitly requested ("only non-logins can join").
-const protectedRoutes: string[] = ['/dashboard', '/organization-setup', '/assets'];
+const protectedRoutes: string[] = ['/dashboard', '/organization-setup', '/assets', '/allocation'];
 const publicRoutes: string[] = ['/'];
 const authRoutes: string[] = ['/login', '/register'];
 
@@ -61,6 +61,11 @@ export async function middleware(request: NextRequest) {
 
   // RBAC for Assets (Hide from Employee)
   if (pathname.startsWith('/assets') && userRole === 'Employee') {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  // RBAC for Allocation (Hide from Employee)
+  if (pathname.startsWith('/allocation') && userRole === 'Employee') {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 

@@ -94,6 +94,11 @@ func main() {
 		v1.GET("/assets/:id/history", middleware.AuthMiddleware(), handlers.AssetHistory)
 		v1.POST("/assets/:id/allocate", middleware.AuthMiddleware(), handlers.AllocateAsset)
 		v1.POST("/assets/:id/return", middleware.AuthMiddleware(), handlers.ReturnAsset)
+		
+		// Asset Transfer requests
+		v1.POST("/assets/:id/transfer", middleware.AuthMiddleware(), handlers.RequestTransfer)
+		v1.POST("/assets/transfers/:request_id/approve", middleware.AuthMiddleware(), handlers.ApproveTransfer)
+		v1.GET("/assets/transfers", middleware.AuthMiddleware(), handlers.ListTransferRequests)
 
 		// Organization Setup
 		v1.GET("/departments", middleware.AuthMiddleware(), handlers.ListDepartments)
