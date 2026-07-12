@@ -56,11 +56,17 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 Allocation & Transfer
               </Link>
             )}
-            <Link href="#" className={styles.navItem}>
+            <Link 
+              href="/booking" 
+              className={`${styles.navItem} ${pathname.startsWith('/booking') ? styles.active : ''}`}
+            >
               Resource Booking
             </Link>
-            <Link href="#" className={styles.navItem}>
-              Maintenance
+            <Link 
+              href="/maintenance" 
+              className={`${styles.navItem} ${pathname.startsWith('/maintenance') ? styles.active : ''}`}
+            >
+              Maintenance Requests
             </Link>
             <Link href="#" className={styles.navItem}>
               Audit

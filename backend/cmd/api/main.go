@@ -94,11 +94,22 @@ func main() {
 		v1.GET("/assets/:id/history", middleware.AuthMiddleware(), handlers.AssetHistory)
 		v1.POST("/assets/:id/allocate", middleware.AuthMiddleware(), handlers.AllocateAsset)
 		v1.POST("/assets/:id/return", middleware.AuthMiddleware(), handlers.ReturnAsset)
-		
+
 		// Asset Transfer requests
 		v1.POST("/assets/:id/transfer", middleware.AuthMiddleware(), handlers.RequestTransfer)
 		v1.POST("/assets/transfers/:request_id/approve", middleware.AuthMiddleware(), handlers.ApproveTransfer)
 		v1.GET("/assets/transfers", middleware.AuthMiddleware(), handlers.ListTransferRequests)
+
+		// Resource Bookings
+		v1.GET("/bookings", middleware.AuthMiddleware(), handlers.ListBookings)
+		v1.POST("/bookings", middleware.AuthMiddleware(), handlers.CreateBooking)
+		v1.PUT("/bookings/:id/cancel", middleware.AuthMiddleware(), handlers.CancelBooking)
+		v1.PUT("/bookings/:id/reschedule", middleware.AuthMiddleware(), handlers.RescheduleBooking)
+
+		// Maintenance Management
+		v1.GET("/maintenance", middleware.AuthMiddleware(), handlers.ListMaintenanceRequests)
+		v1.POST("/maintenance", middleware.AuthMiddleware(), handlers.RaiseMaintenanceRequest)
+		v1.PUT("/maintenance/:id/status", middleware.AuthMiddleware(), handlers.UpdateMaintenanceStatus)
 
 		// Organization Setup
 		v1.GET("/departments", middleware.AuthMiddleware(), handlers.ListDepartments)
