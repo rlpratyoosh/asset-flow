@@ -17,10 +17,12 @@ type User struct {
 	ID           string `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	FullName     string `gorm:"not null"`
 	Username     string `gorm:"uniqueIndex;not null"`
+	Email        string `gorm:"uniqueIndex"`
 	PasswordHash string `gorm:"not null"`
 	ProfilePic   string
 	DepartmentID *string `gorm:"index"`
 	Role         Role    `gorm:"type:varchar(50);default:'Employee';not null"`
+	Status       string  `gorm:"default:'Active'"` // Active or Inactive
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }

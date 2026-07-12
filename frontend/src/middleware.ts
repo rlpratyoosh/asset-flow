@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 
 // As requested, using array variables and logic but keeping elements empty for now,
 // except for the core auth logic the user explicitly requested ("only non-logins can join").
-const protectedRoutes: string[] = ['/dashboard'];
+const protectedRoutes: string[] = ['/dashboard', '/organization-setup', '/assets'];
 const publicRoutes: string[] = ['/'];
 const authRoutes: string[] = ['/login', '/register'];
 
@@ -22,6 +22,7 @@ export async function middleware(request: NextRequest) {
   const refreshToken = request.cookies.get('refresh_token')?.value;
 
   let isAuthenticated = false;
+  let userRole = '';
 
   // We can verify auth by calling the backend /me endpoint directly from the Edge runtime
   if (accessToken || refreshToken) {
@@ -35,6 +36,8 @@ export async function middleware(request: NextRequest) {
       
       if (res.ok) {
         isAuthenticated = true;
+        const data = await res.json();
+        userRole = data.role;
       }
     } catch (error) {
       console.error('Middleware fetch error:', error);
@@ -43,12 +46,17 @@ export async function middleware(request: NextRequest) {
 
   // Logic: only non-logins can join (access auth routes like /login, /register)
   if (isAuthRoute && isAuthenticated) {
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   // Logic: unauthenticated users cannot access protected routes
   if (isProtectedRoute && !isAuthenticated) {
     return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  // RBAC for Organization Setup (Admin only)
+  if (pathname.startsWith('/organization-setup') && userRole !== 'Admin') {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   return NextResponse.next();

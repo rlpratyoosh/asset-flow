@@ -50,6 +50,8 @@ func main() {
 	err = database.DB.AutoMigrate(
 		&models.User{},
 		&models.Session{},
+		&models.Department{},
+		&models.Category{},
 		&models.Asset{},
 		&models.Allocation{},
 		&models.TransferRequest{},
@@ -89,8 +91,21 @@ func main() {
 
 		v1.POST("/assets", middleware.AuthMiddleware(), handlers.RegisterAsset)
 		v1.GET("/assets", middleware.AuthMiddleware(), handlers.ListAssets)
+		v1.GET("/assets/:id/history", middleware.AuthMiddleware(), handlers.AssetHistory)
 		v1.POST("/assets/:id/allocate", middleware.AuthMiddleware(), handlers.AllocateAsset)
 		v1.POST("/assets/:id/return", middleware.AuthMiddleware(), handlers.ReturnAsset)
+
+		// Organization Setup
+		v1.GET("/departments", middleware.AuthMiddleware(), handlers.ListDepartments)
+		v1.POST("/departments", middleware.AuthMiddleware(), handlers.CreateDepartment)
+		v1.PUT("/departments/:id", middleware.AuthMiddleware(), handlers.UpdateDepartment)
+
+		v1.GET("/categories", middleware.AuthMiddleware(), handlers.ListCategories)
+		v1.POST("/categories", middleware.AuthMiddleware(), handlers.CreateCategory)
+		v1.PUT("/categories/:id", middleware.AuthMiddleware(), handlers.UpdateCategory)
+
+		v1.GET("/users", middleware.AuthMiddleware(), handlers.ListUsers)
+		v1.PUT("/users/:id/role", middleware.AuthMiddleware(), handlers.UpdateUserRole)
 	}
 
 	r.Static("/pfp", "./pfp")

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -20,13 +21,15 @@ func RegisterAsset(c *gin.Context) {
 	}
 
 	var req struct {
-		Name            string  `json:"name" binding:"required"`
-		CategoryID      string  `json:"category_id" binding:"required"`
-		SerialNumber    string  `json:"serial_number"`
-		Condition       string  `json:"condition"`
-		Location        string  `json:"location"`
-		IsShared        bool    `json:"is_shared"`
-		AcquisitionCost float64 `json:"acquisition_cost"`
+		Name            string    `json:"name" binding:"required"`
+		CategoryID      string    `json:"category_id" binding:"required"`
+		SerialNumber    string    `json:"serial_number"`
+		AcquisitionDate time.Time `json:"acquisition_date"`
+		AcquisitionCost float64   `json:"acquisition_cost"`
+		Condition       string    `json:"condition"`
+		Location        string    `json:"location"`
+		PhotoURL        string    `json:"photo_url"`
+		IsShared        bool      `json:"is_shared"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -38,19 +41,27 @@ func RegisterAsset(c *gin.Context) {
 		req.Condition = "Good"
 	}
 
-	var count int64
-	database.DB.Model(&models.Asset{}).Count(&count)
-	assetTag := fmt.Sprintf("AF-%04d", count+1)
+	var lastAsset models.Asset
+	database.DB.Unscoped().Order("asset_tag desc").First(&lastAsset)
+	nextID := 1
+	if lastAsset.AssetTag != "" && len(lastAsset.AssetTag) > 3 {
+		if id, err := strconv.Atoi(lastAsset.AssetTag[3:]); err == nil {
+			nextID = id + 1
+		}
+	}
+	assetTag := fmt.Sprintf("AF-%04d", nextID)
 
 	asset := models.Asset{
 		AssetTag:        assetTag,
 		Name:            req.Name,
 		CategoryID:      req.CategoryID,
 		SerialNumber:    req.SerialNumber,
+		AcquisitionDate: req.AcquisitionDate,
+		AcquisitionCost: req.AcquisitionCost,
 		Condition:       req.Condition,
 		Location:        req.Location,
+		PhotoURL:        req.PhotoURL,
 		IsShared:        req.IsShared,
-		AcquisitionCost: req.AcquisitionCost,
 		State:           "Available",
 	}
 
@@ -63,25 +74,15 @@ func RegisterAsset(c *gin.Context) {
 }
 
 func ListAssets(c *gin.Context) {
-	search := c.Query("search")
+	q := c.Query("q")
 	categoryID := c.Query("category_id")
 	state := c.Query("state")
+	location := c.Query("location")
 
-	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	if page < 1 {
-		page = 1
-	}
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
-	if limit < 1 {
-		limit = 10
-	}
-	offset := (page - 1) * limit
+	query := database.DB.Model(&models.Asset{}).Preload("Category")
 
-	query := database.DB.Model(&models.Asset{})
-
-	if search != "" {
-		searchPattern := "%" + search + "%"
-		query = query.Where("name ILIKE ? OR asset_tag ILIKE ?", searchPattern, searchPattern)
+	if q != "" {
+		query = query.Where("asset_tag ILIKE ? OR name ILIKE ? OR serial_number ILIKE ?", "%"+q+"%", "%"+q+"%", "%"+q+"%")
 	}
 
 	if categoryID != "" {
@@ -92,21 +93,17 @@ func ListAssets(c *gin.Context) {
 		query = query.Where("state = ?", state)
 	}
 
-	var total int64
-	query.Count(&total)
+	if location != "" {
+		query = query.Where("location ILIKE ?", "%"+location+"%")
+	}
 
 	var assets []models.Asset
-	if err := query.Offset(offset).Limit(limit).Order("created_at desc").Find(&assets).Error; err != nil {
+	if err := query.Find(&assets).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch assets"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"data":  assets,
-		"total": total,
-		"page":  page,
-		"limit": limit,
-	})
+	c.JSON(http.StatusOK, assets)
 }
 
 func AllocateAsset(c *gin.Context) {
@@ -223,4 +220,38 @@ func ReturnAsset(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Asset returned successfully"})
+}
+
+func AssetHistory(c *gin.Context) {
+	assetID := c.Param("id")
+
+	var allocations []models.Allocation
+	var maintenance []models.MaintenanceRequest
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		database.DB.Where("asset_id = ?", assetID).Order("created_at desc").Find(&allocations)
+	}()
+
+	go func() {
+		defer wg.Done()
+		database.DB.Where("asset_id = ?", assetID).Order("created_at desc").Find(&maintenance)
+	}()
+
+	wg.Wait()
+
+	if allocations == nil {
+		allocations = []models.Allocation{}
+	}
+	if maintenance == nil {
+		maintenance = []models.MaintenanceRequest{}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"allocations": allocations,
+		"maintenance": maintenance,
+	})
 }
